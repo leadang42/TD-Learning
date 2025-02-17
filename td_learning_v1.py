@@ -148,7 +148,7 @@ def plot_results(time_points, values_history, value_differences, td_errors_histo
     axes[3].set_title('TD Error Over Learning')
     
     plt.tight_layout()
-    plt.savefig(f'results/td_learning_{feature_detector}.png')
+    plt.savefig(f'results/td_learning_{feature_detector}_02epsilon.png')
     plt.show()
 
 def run_both_simulations():
@@ -158,7 +158,7 @@ def run_both_simulations():
     print("\nRunning Tapped Delay Line simulation...")
     time_points, values_history, value_differences, td_errors_history = run_simulation(
         feature_detector="tapped_delay_line",
-        epsilon=0.1, 
+        epsilon=0.01, 
         gamma=1.0, 
         memory_span=12.0
     )
@@ -168,7 +168,7 @@ def run_both_simulations():
     print("\nRunning Boxcar simulation...")
     time_points, values_history, value_differences, td_errors_history = run_simulation(
         feature_detector="box_car",
-        epsilon=0.1, 
+        epsilon=0.2, 
         gamma=1.0, 
         memory_span=12.0
     )
