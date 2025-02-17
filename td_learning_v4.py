@@ -2,6 +2,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 from copy import deepcopy
 
+plt.rcParams.update({
+    'font.size': 14,
+    'axes.labelsize': 14,
+    'axes.titlesize': 16,
+    'xtick.labelsize': 12,
+    'ytick.labelsize': 12,
+    'legend.fontsize': 12
+})
+
 # TD LEARNING FUNCTIONS #
 def stimulus_function(t):
     return 1.0 if np.isclose(t, 10.0) else 0.0
@@ -182,7 +191,7 @@ def exercise_4():
 def plot_partial_reinforcement_results(time_points, analysis_results, p):
     """Plot results from partial reinforcement analysis"""
     
-    fig, axes = plt.subplots(4, 1, figsize=(12, 12), sharex=True)
+    fig, axes = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
     
     # Plot value estimates
     axes[0].plot(time_points, analysis_results['values'][0], color=plt.cm.winter(1.0), label='All trials')
@@ -209,16 +218,28 @@ def plot_partial_reinforcement_results(time_points, analysis_results, p):
     axes[2].legend()
     
     # Plot dopamine signal
-    axes[3].plot(time_points, analysis_results['dopamine'], color='black')
-    axes[3].set_xlabel('Time (s)')
-    axes[3].set_ylabel('DA(δ(t))')
-    axes[3].set_title('Modeled Dopamine Signal')
+    #axes[3].plot(time_points, analysis_results['dopamine'], color='black')
+    #axes[3].set_xlabel('Time (s)')
+    #axes[3].set_ylabel('DA(δ(t))')
+    #axes[3].set_title('Modeled Dopamine Signal')
     
     plt.tight_layout()
     plt.savefig(f'results/partial_reinforcement_p{p}.png')
     plt.show()
     
     return fig
+
+def plot_dopamine_trajectory(time_points, analysis_results, p):
+    plt.figure(figsize=(12, 4))
+    plt.plot(time_points, analysis_results['dopamine'], color='black')
+    plt.xlabel('Time (s)')
+    plt.ylabel('DA(δ(t))')
+    plt.title('Modeled Dopamine Signal')
+    
+    plt.savefig(f'results/dopamine_activity_p{p}.png')
+    plt.show()
+    
+    return plt.gcf()
 
 def analyze_last_100_trials(time_points, values_history, value_differences, td_errors_history, reward_present):
     """Analyze results from last 100 trials"""
@@ -261,13 +282,13 @@ def analyze_last_100_trials(time_points, values_history, value_differences, td_e
     }
     
 def exercise_5():
-    # Exercise 5-6: Run and analyze p=0.5 case
     print("\nRunning partial reinforcement simulation (p=0.5)...")
     time_points, values_history, value_differences, td_errors_history, reward_present = run_partial_reinforcement(p=0.5)
     analysis_results = analyze_last_100_trials(time_points, values_history, value_differences, td_errors_history, reward_present)
     
     plot_partial_reinforcement_results(time_points, analysis_results, p=0.5)
-    plt.show()
+
+    plot_dopamine_trajectory(time_points, analysis_results, p=0.5)
    
 def analyze_dopamine_peaks(p_values, n_trials=1000):
     """Analyze dopamine peaks for different reward probabilities"""
