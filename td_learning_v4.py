@@ -230,7 +230,7 @@ def plot_partial_reinforcement_results(time_points, analysis_results, p):
     return fig
 
 def plot_dopamine_trajectory(time_points, analysis_results, p):
-    plt.figure(figsize=(12, 4))
+    plt.figure(figsize=(12, 5))
     plt.plot(time_points, analysis_results['dopamine'], color='black')
     plt.xlabel('Time (s)')
     plt.ylabel('DA(δ(t))')
