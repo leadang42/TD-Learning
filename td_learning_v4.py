@@ -45,7 +45,7 @@ def get_td_error(state, next_state, reward, weights, gamma):
     td_error = reward + gamma * next_value - current_value
     return td_error
 
-def run_partial_reinforcement(p=0.5, n_trials=1000, feature_detector="box_car", t_max=25.0, dt=0.5, memory_span=12.0, epsilon=0.01, gamma=1.0):
+def td_learning(p=0.5, n_trials=1000, feature_detector="box_car", t_max=25.0, dt=0.5, memory_span=12.0, epsilon=0.01, gamma=1.0):
     """Run TD learning with partial reinforcement probability p"""
     
     # Initialize parameters
@@ -99,11 +99,6 @@ def run_partial_reinforcement(p=0.5, n_trials=1000, feature_detector="box_car", 
         td_errors_history[trial] = trial_td_errors
         value_differences[trial, 1:] = gamma * trial_values[1:] - trial_values[:-1]
     
-    #if p == 1.0:
-    #    return time_points, values_history, value_differences, td_errors_history
-    #else:
-    #    return time_points, values_history, td_errors_history, reward_present
-    
     return time_points, values_history, value_differences, td_errors_history, reward_present
 
 # DOPAMINE FUNCTIONS #
@@ -117,7 +112,7 @@ def model_dopamine(x, alpha=6.0, beta=6.0, x_star=0.27):
         return x_star + (x - x_star)/beta
 
 # EXERCISE 3 AND 4 #
-def plot_results_ex3_ex4(time_points, values_history, value_differences, td_errors_history, feature_detector):
+def plot_tdl_vars(time_points, values_history, value_differences, td_errors_history, feature_detector):
 
     fig, axes = plt.subplots(4, 1, figsize=(12, 15), sharex=True)
     trial_indices = np.arange(0, values_history.shape[0], 10)
@@ -164,7 +159,7 @@ def plot_results_ex3_ex4(time_points, values_history, value_differences, td_erro
 def exercise_3():
     # Run tapped delay line simulation
     print("\nRunning Tapped Delay Line simulation...")
-    time_points, values_history, value_differences, td_errors_history, _ = run_partial_reinforcement(
+    time_points, values_history, value_differences, td_errors_history, _ = td_learning(
         p=1.0,
         n_trials=201,
         feature_detector="tapped_delay_line",
@@ -172,12 +167,12 @@ def exercise_3():
         gamma=1.0, 
         memory_span=12.0
     )
-    plot_results_ex3_ex4(time_points, values_history, value_differences, td_errors_history, "tapped_delay_line")
+    plot_tdl_vars(time_points, values_history, value_differences, td_errors_history, "tapped_delay_line")
 
 def exercise_4():    
     # Run boxcar simulation
     print("\nRunning Boxcar simulation...")
-    time_points, values_history, value_differences, td_errors_history, _ = run_partial_reinforcement(
+    time_points, values_history, value_differences, td_errors_history, _ = td_learning(
         p=1.0,
         n_trials=121,
         feature_detector="box_car",
@@ -185,40 +180,40 @@ def exercise_4():
         gamma=1.0, 
         memory_span=12.0
     )
-    plot_results_ex3_ex4(time_points, values_history, value_differences, td_errors_history, "box_car")
+    plot_tdl_vars(time_points, values_history, value_differences, td_errors_history, "box_car")
 
 # EXERCISE 5 #
-def plot_partial_reinforcement_results(time_points, analysis_results, p):
+def plot_tdl_vars_mean(time_points, mean_100trials, p):
     """Plot results from partial reinforcement analysis"""
     
     fig, axes = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
     
     # Plot value estimates
-    axes[0].plot(time_points, analysis_results['values'][2], color=plt.cm.winter(1.0), label='Unrewarded')
-    axes[0].plot(time_points, analysis_results['values'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[0].plot(time_points, analysis_results['values'][0], color=plt.cm.winter(0.0), label='All trials')
+    axes[0].plot(time_points, mean_100trials['values'][2], color=plt.cm.winter(1.0), label='Unrewarded')
+    axes[0].plot(time_points, mean_100trials['values'][1], color=plt.cm.winter(0.5), label='Rewarded')
+    axes[0].plot(time_points, mean_100trials['values'][0], color=plt.cm.winter(0.0), label='All trials')
     axes[0].set_ylabel('Value Estimate')
     axes[0].set_title(f'Value Estimate')
     axes[0].legend()
     
     # Plot value differences
-    axes[1].plot(time_points, analysis_results['value_differences'][2], color=plt.cm.winter(1.0), label='Unrewarded')
-    axes[1].plot(time_points, analysis_results['value_differences'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[1].plot(time_points, analysis_results['value_differences'][0], color=plt.cm.winter(0.0), label='All trials')
+    axes[1].plot(time_points, mean_100trials['value_differences'][2], color=plt.cm.winter(1.0), label='Unrewarded')
+    axes[1].plot(time_points, mean_100trials['value_differences'][1], color=plt.cm.winter(0.5), label='Rewarded')
+    axes[1].plot(time_points, mean_100trials['value_differences'][0], color=plt.cm.winter(0.0), label='All trials')
     axes[1].set_ylabel('Value Differences')
     axes[1].set_title('Value Differences')
     axes[1].legend()
     
     # Plot TD errors
-    axes[2].plot(time_points, analysis_results['td_errors'][2], color=plt.cm.winter(1.0), label='Unrewarded')
-    axes[2].plot(time_points, analysis_results['td_errors'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[2].plot(time_points, analysis_results['td_errors'][0], color=plt.cm.winter(0.0), label='All trials')
+    axes[2].plot(time_points, mean_100trials['td_errors'][2], color=plt.cm.winter(1.0), label='Unrewarded')
+    axes[2].plot(time_points, mean_100trials['td_errors'][1], color=plt.cm.winter(0.5), label='Rewarded')
+    axes[2].plot(time_points, mean_100trials['td_errors'][0], color=plt.cm.winter(0.0), label='All trials')
     axes[2].set_ylabel('TD Error')
     axes[2].set_title('TD Error')
     axes[2].legend()
     
     # Plot dopamine signal
-    #axes[3].plot(time_points, analysis_results['dopamine'], color='black')
+    #axes[3].plot(time_points, mean_100trials['dopamine'], color='black')
     #axes[3].set_xlabel('Time (s)')
     #axes[3].set_ylabel('DA(δ(t))')
     #axes[3].set_title('Modeled Dopamine Signal')
@@ -229,19 +224,24 @@ def plot_partial_reinforcement_results(time_points, analysis_results, p):
     
     return fig
 
-def plot_dopamine_trajectory(time_points, analysis_results, p):
+def plot_dopamine_activity(time_points, dopamine_activities, p_values):
     plt.figure(figsize=(12, 5))
-    plt.plot(time_points, analysis_results['dopamine'], color=plt.cm.winter(0.0))
+    
+    for i, p in enumerate(p_values):
+        plt.plot(time_points, dopamine_activities[i], color=plt.cm.winter(1-p), label=f'p={p}')
+        
+    #plt.plot(time_points, dopamine_activities[0], color=plt.cm.winter(0.0))
+    plt.legend()
     plt.xlabel('Time (s)')
     plt.ylabel('DA(δ(t))')
     plt.title('Modeled Dopamine Signal')
     
-    plt.savefig(f'results/dopamine_activity_p{p}.png')
+    plt.savefig(f'results/dopamine_activity_p{p_values}.png')
     plt.show()
     
     return plt.gcf()
 
-def analyze_last_100_trials(time_points, values_history, value_differences, td_errors_history, reward_present):
+def compute_mean_100trials(time_points, values_history, value_differences, td_errors_history, reward_present):
     """Analyze results from last 100 trials"""
     
     # Get last 100 trials
@@ -283,51 +283,60 @@ def analyze_last_100_trials(time_points, values_history, value_differences, td_e
     
 def exercise_5():
     print("\nRunning partial reinforcement simulation (p=0.5)...")
-    time_points, values_history, value_differences, td_errors_history, reward_present = run_partial_reinforcement(p=0.5)
-    analysis_results = analyze_last_100_trials(time_points, values_history, value_differences, td_errors_history, reward_present)
+    time_points, values_history, value_differences, td_errors_history, reward_present = td_learning(p=0.5)
+    mean_100trials = compute_mean_100trials(time_points, values_history, value_differences, td_errors_history, reward_present)
     
-    plot_partial_reinforcement_results(time_points, analysis_results, p=0.5)
+    plot_tdl_vars_mean(time_points, mean_100trials, p=0.5)
 
-    plot_dopamine_trajectory(time_points, analysis_results, p=0.5)
+    plot_dopamine_activity(time_points, [mean_100trials['dopamine']], p_values=[0.5])
    
-def analyze_dopamine_peaks(p_values, n_trials=1000):
-    """Analyze dopamine peaks for different reward probabilities"""
-    stimulus_peaks = []
-    reward_peaks = []
-    
-    for p in p_values:
-        # Run simulation
-        time_points, values_history, td_errors_history, reward_present = run_partial_reinforcement(
-            p=p, n_trials=n_trials)
-        
-        # Analyze last 100 trials
-        analysis = analyze_last_100_trials(time_points, values_history, td_errors_history, reward_present)
-        
-        # Find peaks around stimulus (10s) and reward (20s) times
-        stimulus_idx = np.abs(time_points - 10.0).argmin()
-        reward_idx = np.abs(time_points - 20.0).argmin()
-        
-        # Get dopamine levels at these times
-        stimulus_peaks.append(analysis['dopamine'][stimulus_idx])
-        reward_peaks.append(analysis['dopamine'][reward_idx])
-    
-    return stimulus_peaks, reward_peaks
-
-def exercise_5_to_8():
+def exercise_6_7():
     # Exercise 7-8: Analyze multiple reward probabilities
     print("\nAnalyzing different reward probabilities...")
     p_values = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
-    stimulus_peaks, reward_peaks = analyze_dopamine_peaks(p_values)
+    n_trials=1000
+    feature_detector="box_car"
+    epsilon=0.01
+    t_max=25.0
+    dt=0.5
+    
+    stimulus_peaks = []
+    reward_peaks = []
+    dopamine_activities = []
+    
+    for p in p_values:
+        
+        time_points, values_history, values_differences_history, td_errors_history, reward_present = td_learning(p=p, n_trials=n_trials, feature_detector=feature_detector, epsilon=epsilon, t_max=t_max, dt=dt)
+        analysis = compute_mean_100trials(time_points, values_history, values_differences_history, td_errors_history, reward_present)
+        
+        # Find peaks around stimulus (10s) and reward (20s) times
+        stimulus_idx = int(10.0 / dt)
+        reward_idx = int(20.0 / dt)
+        window_idx = int(2.5 / dt)
+        
+        dopamine = analysis['dopamine']
+        dopamine_activities.append(deepcopy(dopamine))
+        
+        max_dopamine_at_stimulus = np.max(dopamine[stimulus_idx-window_idx:stimulus_idx+window_idx])
+        max_dopamine_at_reward = np.max(dopamine[reward_idx-window_idx:reward_idx+window_idx])
+        
+        # Get dopamine levels at these times
+        stimulus_peaks.append(max_dopamine_at_stimulus)
+        reward_peaks.append(max_dopamine_at_reward)
+
+    # Plot dopamine activity for different reward probabilities
+    plot_dopamine_activity(time_points, dopamine_activities, p_values)
     
     # Plot peaks vs probability
     plt.figure(figsize=(8, 6))
-    plt.plot(p_values, stimulus_peaks, 'b-', label='Stimulus response')
-    plt.plot(p_values, reward_peaks, color=plt.cm.winter(1.0), label='Reward response')
+    plt.plot(p_values, stimulus_peaks, color=plt.cm.winter(1.0), label='Stimulus response')
+    plt.plot(p_values, reward_peaks, color=plt.cm.winter(0.3), label='Reward response')
     plt.xlabel('Reward probability (p)')
     plt.ylabel('Peak dopamine response')
     plt.legend()
     plt.title('Dopamine Response vs Reward Probability')
+    plt.savefig('results/dopamine_response_vs_probability')
     plt.show()
 
 if __name__ == "__main__":
-    exercise_5()
+    exercise_6_7()
