@@ -151,28 +151,28 @@ def plot_results(time_points, values_history, value_differences, td_errors_histo
     plt.savefig(f'results/td_learning_{feature_detector}_02epsilon.png')
     plt.show()
 
-def run_both_simulations():
-    """Run simulations for both tapped delay line and boxcar features."""
-    
+def exercise_3():
     # Run tapped delay line simulation
     print("\nRunning Tapped Delay Line simulation...")
     time_points, values_history, value_differences, td_errors_history = run_simulation(
         feature_detector="tapped_delay_line",
-        epsilon=0.01, 
+        epsilon=0.2, 
         gamma=1.0, 
         memory_span=12.0
     )
     plot_results(time_points, values_history, value_differences, td_errors_history, "tapped_delay_line")
-    
+
+def exercise_4():    
     # Run boxcar simulation
     print("\nRunning Boxcar simulation...")
     time_points, values_history, value_differences, td_errors_history = run_simulation(
         feature_detector="box_car",
-        epsilon=0.2, 
+        epsilon=0.01, 
         gamma=1.0, 
         memory_span=12.0
     )
     plot_results(time_points, values_history, value_differences, td_errors_history, "box_car")
 
 if __name__ == "__main__":
-    run_both_simulations()
+    exercise_3()
+    exercise_4()
