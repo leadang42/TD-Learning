@@ -194,25 +194,25 @@ def plot_partial_reinforcement_results(time_points, analysis_results, p):
     fig, axes = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
     
     # Plot value estimates
-    axes[0].plot(time_points, analysis_results['values'][0], color=plt.cm.winter(1.0), label='All trials')
+    axes[0].plot(time_points, analysis_results['values'][2], color=plt.cm.winter(1.0), label='Unrewarded')
     axes[0].plot(time_points, analysis_results['values'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[0].plot(time_points, analysis_results['values'][2], color=plt.cm.winter(0.0), label='Unrewarded')
+    axes[0].plot(time_points, analysis_results['values'][0], color=plt.cm.winter(0.0), label='All trials')
     axes[0].set_ylabel('Value Estimate')
     axes[0].set_title(f'Value Estimate')
     axes[0].legend()
     
     # Plot value differences
-    axes[1].plot(time_points, analysis_results['value_differences'][0], color=plt.cm.winter(1.0), label='All trials')
+    axes[1].plot(time_points, analysis_results['value_differences'][2], color=plt.cm.winter(1.0), label='Unrewarded')
     axes[1].plot(time_points, analysis_results['value_differences'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[1].plot(time_points, analysis_results['value_differences'][2], color=plt.cm.winter(0.0), label='Unrewarded')
+    axes[1].plot(time_points, analysis_results['value_differences'][0], color=plt.cm.winter(0.0), label='All trials')
     axes[1].set_ylabel('Value Differences')
     axes[1].set_title('Value Differences')
     axes[1].legend()
     
     # Plot TD errors
-    axes[2].plot(time_points, analysis_results['td_errors'][0], color=plt.cm.winter(1.0), label='All trials')
+    axes[2].plot(time_points, analysis_results['td_errors'][2], color=plt.cm.winter(1.0), label='Unrewarded')
     axes[2].plot(time_points, analysis_results['td_errors'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[2].plot(time_points, analysis_results['td_errors'][2], color=plt.cm.winter(0.0), label='Unrewarded')
+    axes[2].plot(time_points, analysis_results['td_errors'][0], color=plt.cm.winter(0.0), label='All trials')
     axes[2].set_ylabel('TD Error')
     axes[2].set_title('TD Error')
     axes[2].legend()
@@ -231,7 +231,7 @@ def plot_partial_reinforcement_results(time_points, analysis_results, p):
 
 def plot_dopamine_trajectory(time_points, analysis_results, p):
     plt.figure(figsize=(12, 5))
-    plt.plot(time_points, analysis_results['dopamine'], color='black')
+    plt.plot(time_points, analysis_results['dopamine'], color=plt.cm.winter(0.0))
     plt.xlabel('Time (s)')
     plt.ylabel('DA(δ(t))')
     plt.title('Modeled Dopamine Signal')
