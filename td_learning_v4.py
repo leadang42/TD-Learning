@@ -116,11 +116,11 @@ def plot_tdl_vars(time_points, values_history, value_differences, td_errors_hist
 
     fig, axes = plt.subplots(4, 1, figsize=(12, 15), sharex=True)
     trial_indices = np.arange(0, values_history.shape[0], 10)
-    colors = plt.cm.winter(np.linspace(1, 0, len(trial_indices))*0.9)
+    colors = plt.cm.viridis(np.linspace(1, 0, len(trial_indices))*0.8)
     
     # Plot stimulus and reward
-    axes[0].plot(time_points, [stimulus_function(t) for t in time_points], color=plt.cm.winter(0.0), label='Stimulus', linewidth=2)
-    axes[0].plot(time_points, [reward_function(t) for t in time_points], color=plt.cm.winter(0.9), label='Reward', linewidth=2)
+    axes[0].plot(time_points, [stimulus_function(t) for t in time_points], color=plt.cm.viridis(0.0), label='Stimulus', linewidth=2)
+    axes[0].plot(time_points, [reward_function(t) for t in time_points], color=plt.cm.viridis(0.8), label='Reward', linewidth=2)
     axes[0].set_ylabel('Magnitude')
     axes[0].set_title('Stimulus and Reward')
     axes[0].legend(loc='upper right')
@@ -189,25 +189,25 @@ def plot_tdl_vars_mean(time_points, mean_100trials, p):
     fig, axes = plt.subplots(3, 1, figsize=(12, 12), sharex=True)
     
     # Plot value estimates
-    axes[0].plot(time_points, mean_100trials['values'][2], color=plt.cm.winter(1.0), label='Unrewarded')
-    axes[0].plot(time_points, mean_100trials['values'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[0].plot(time_points, mean_100trials['values'][0], color=plt.cm.winter(0.0), label='All trials')
+    axes[0].plot(time_points, mean_100trials['values'][2], color=plt.cm.viridis(0.8), label='Unrewarded')
+    axes[0].plot(time_points, mean_100trials['values'][1], color=plt.cm.viridis(0.5), label='Rewarded')
+    axes[0].plot(time_points, mean_100trials['values'][0], color=plt.cm.viridis(0.0), label='All trials')
     axes[0].set_ylabel('Value Estimate')
     axes[0].set_title(f'Value Estimate')
     axes[0].legend()
     
     # Plot value differences
-    axes[1].plot(time_points, mean_100trials['value_differences'][2], color=plt.cm.winter(1.0), label='Unrewarded')
-    axes[1].plot(time_points, mean_100trials['value_differences'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[1].plot(time_points, mean_100trials['value_differences'][0], color=plt.cm.winter(0.0), label='All trials')
+    axes[1].plot(time_points, mean_100trials['value_differences'][2], color=plt.cm.viridis(0.8), label='Unrewarded')
+    axes[1].plot(time_points, mean_100trials['value_differences'][1], color=plt.cm.viridis(0.5), label='Rewarded')
+    axes[1].plot(time_points, mean_100trials['value_differences'][0], color=plt.cm.viridis(0.0), label='All trials')
     axes[1].set_ylabel('Value Differences')
     axes[1].set_title('Value Differences')
     axes[1].legend()
     
     # Plot TD errors
-    axes[2].plot(time_points, mean_100trials['td_errors'][2], color=plt.cm.winter(1.0), label='Unrewarded')
-    axes[2].plot(time_points, mean_100trials['td_errors'][1], color=plt.cm.winter(0.5), label='Rewarded')
-    axes[2].plot(time_points, mean_100trials['td_errors'][0], color=plt.cm.winter(0.0), label='All trials')
+    axes[2].plot(time_points, mean_100trials['td_errors'][2], color=plt.cm.viridis(0.8), label='Unrewarded')
+    axes[2].plot(time_points, mean_100trials['td_errors'][1], color=plt.cm.viridis(0.5), label='Rewarded')
+    axes[2].plot(time_points, mean_100trials['td_errors'][0], color=plt.cm.viridis(0.0), label='All trials')
     axes[2].set_ylabel('TD Error')
     axes[2].set_title('TD Error')
     axes[2].legend()
@@ -228,9 +228,9 @@ def plot_dopamine_activity(time_points, dopamine_activities, p_values):
     plt.figure(figsize=(12, 5))
     
     for i, p in enumerate(p_values):
-        plt.plot(time_points, dopamine_activities[i], color=plt.cm.winter(1-p), label=f'p={p}')
+        plt.plot(time_points, dopamine_activities[i], color=plt.cm.viridis((1-p)*0.8), label=f'p={p}')
         
-    #plt.plot(time_points, dopamine_activities[0], color=plt.cm.winter(0.0))
+    #plt.plot(time_points, dopamine_activities[0], color=plt.cm.viridis(0.0))
     plt.legend()
     plt.xlabel('Time (s)')
     plt.ylabel('DA(δ(t))')
@@ -272,13 +272,23 @@ def compute_mean_100trials(time_points, values_history, value_differences, td_er
     mean_unrewarded_td_errors = np.mean(unrewarded_td_errors, axis=0)
     
     # Convert TD errors to dopamine signal
-    dopamine_signal = np.vectorize(model_dopamine)(mean_all_td_errors)
+    # dopamine_signal = np.vectorize(model_dopamine)(mean_all_td_errors)
+    mean_dopamine_signal = np.mean(np.vectorize(model_dopamine)(last_100_td_errors), axis=0)
+    
+    #dopamine_signal = np.zeros_like(last_100_td_errors[0]) 
+    
+    #for trial_idx in range(len(last_100_td_errors)):
+        
+    #    for time_idx in range(len(last_100_td_errors[trial_idx])):
+    #        dopamine_signal[time_idx] += model_dopamine(last_100_td_errors[trial_idx][time_idx])
+    
+    #mean_dopamine_signal = dopamine_signal / len(last_100_td_errors)
     
     return {
         'values': (mean_all_values, mean_rewarded_values, mean_unrewarded_values),
         'value_differences': (mean_all_value_differences, mean_rewarded_value_differences, mean_unrewarded_value_differences),
         'td_errors': (mean_all_td_errors, mean_rewarded_td_errors, mean_unrewarded_td_errors),
-        'dopamine': dopamine_signal
+        'dopamine': mean_dopamine_signal
     }
     
 def exercise_5():
@@ -293,7 +303,7 @@ def exercise_5():
 def exercise_6_7():
     # Exercise 7-8: Analyze multiple reward probabilities
     print("\nAnalyzing different reward probabilities...")
-    p_values = np.array([0.0, 0.25, 0.5, 0.75, 1.0])
+    p_values = np.array([1.0, 0.75, 0.5, 0.25, 0.0])
     n_trials=1000
     feature_detector="box_car"
     epsilon=0.01
@@ -329,8 +339,8 @@ def exercise_6_7():
     
     # Plot peaks vs probability
     plt.figure(figsize=(8, 6))
-    plt.plot(p_values, stimulus_peaks, color=plt.cm.winter(1.0), label='Stimulus response')
-    plt.plot(p_values, reward_peaks, color=plt.cm.winter(0.3), label='Reward response')
+    plt.plot(p_values, stimulus_peaks, color=plt.cm.viridis(0.0), label='Stimulus response')
+    plt.plot(p_values, reward_peaks, color=plt.cm.viridis(0.8), label='Reward response')
     plt.xlabel('Reward probability (p)')
     plt.ylabel('Peak dopamine response')
     plt.legend()
