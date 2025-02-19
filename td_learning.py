@@ -121,7 +121,7 @@ def plot_tdl_vars(time_points, values_history, value_differences, td_errors_hist
     # Plot stimulus and reward
     axes[0].plot(time_points, [stimulus_function(t) for t in time_points], color=plt.cm.viridis(0.0), label='Stimulus', linewidth=2)
     axes[0].plot(time_points, [reward_function(t) for t in time_points], color=plt.cm.viridis(0.8), label='Reward', linewidth=2)
-    axes[0].set_ylabel('Magnitude')
+    axes[0].set_ylabel('')
     axes[0].set_title('Stimulus and Reward')
     axes[0].legend(loc='upper right')
     
@@ -291,7 +291,7 @@ def compute_mean_100trials(time_points, values_history, value_differences, td_er
         'dopamine': mean_dopamine_signal
     }
     
-def exercise_5():
+def exercise_5(): 
     print("\nRunning partial reinforcement simulation (p=0.5)...")
     time_points, values_history, value_differences, td_errors_history, reward_present = td_learning(p=0.5)
     mean_100trials = compute_mean_100trials(time_points, values_history, value_differences, td_errors_history, reward_present)
@@ -349,4 +349,4 @@ def exercise_6_7():
     plt.show()
 
 if __name__ == "__main__":
-    exercise_6_7()
+    exercise_4()
